@@ -1,5 +1,6 @@
 package csw.kakao.talk.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
@@ -47,7 +48,9 @@ public static class Serializer extends JsonSerializer<Template> {
         gen.writeStringField("version", value.getVersion());
         gen.writeObjectFieldStart("template");
         gen.writeObjectField("outputs", value.getOutputs());
-
+        if (value.quickReplies != null && !value.quickReplies.isEmpty()) {
+            gen.writeObjectField("quickReplies", value.getQuickReplies());
+        }
 
         gen.writeEndObject();
         gen.writeEndObject();
@@ -151,9 +154,18 @@ public static class Serializer extends JsonSerializer<Template> {
 
     @Data
     public static class QuickReply {
-        private String action;
+        private String action = "message";
         private String label;
         private String messageText;
+
+        public QuickReply(String label, String messageText) {
+            this.label = label;
+            this.messageText = messageText;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
